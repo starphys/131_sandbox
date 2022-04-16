@@ -5,7 +5,7 @@ from flask_login import LoginManager
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-UPLOAD_FOLDER = 'app/static/uploads/'
+UPLOAD_FOLDER = 'app/static/images/'
 
 myapp_obj = Flask(__name__)
 

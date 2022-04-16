@@ -1,6 +1,6 @@
 from app import myapp_obj, db, basedir
-from app.forms import LoginForm, SignUpForm
-from app.models import User
+from app.forms import LoginForm, SignUpForm, ListingForm
+from app.models import Listing, User
 from flask import redirect, render_template, flash, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -53,7 +53,7 @@ def logout():
 	logout_user()
 	return redirect('/login')
 
-@myapp_obj.route('/home')
+@myapp_obj.route('/')
 @login_required
 def home():
 	return 'home'
@@ -65,11 +65,50 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 	
-@myapp_obj.route('/')
+@myapp_obj.route('/newlisting', methods=['GET','POST'])
+@login_required
 def upload_form():
-	return render_template('upload.html')
+	form = ListingForm()
 
-@myapp_obj.route('/', methods=['POST'])
+	if form.validate_on_submit():
+		if not form.image.data:
+			flash('Please select an image')
+			return redirect(request.url)
+		
+		file = form.image.data
+		if file.filename == '':
+			flash('Please select an image')
+			return redirect(request.url)
+		
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			
+			if not os.path.exists(myapp_obj.config['UPLOAD_FOLDER']):
+				os.makedirs(myapp_obj.config['UPLOAD_FOLDER'])
+			
+			file.save(os.path.join(myapp_obj.config['UPLOAD_FOLDER'], filename))
+			
+			l = Listing(title=form.title.data, description=form.description.data, image=filename,seller=current_user)
+			db.session.add(l)
+			db.session.commit()
+			
+			listing = Listing.query.filter_by(image=filename)[0]
+			print(listing)
+
+			return render_template('upload.html', title='New Listing', form=form, filename=listing.image)
+		else:
+			flash('Allowed image types are png, jpg, jpeg, and gif')
+			return redirect(request.url)
+	return render_template('upload.html', title='New Listing', form=form)
+
+@myapp_obj.route('/display/<filename>')
+@login_required
+def display_image(filename):
+	return redirect(url_for('static', filename='images/' + filename), code=301)
+
+
+
+"""@myapp_obj.route('/', methods=['POST'])
 def upload_image():
 	if 'file' not in request.files:
 		flash('No file part')
@@ -90,8 +129,4 @@ def upload_image():
 		return render_template('upload.html', filename=filename)
 	else:
 		flash('Allowed image types are -> png, jpg, jpeg, gif')
-		return redirect(request.url)
-
-@myapp_obj.route('/display/<filename>')
-def display_image(filename):
-	return redirect(url_for('static', filename='uploads/' + filename), code=301)
+		return redirect(request.url)"""
