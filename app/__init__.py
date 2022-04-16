@@ -13,7 +13,7 @@ myapp_obj.config.from_mapping(
     SECRET_KEY = 'you-will-never-guess',
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db'),
     UPLOAD_FOLDER=UPLOAD_FOLDER,
-    MAX_CONTENT_LENGTH = 16*1024*1024
+    MAX_CONTENT_LENGTH = 5*1024*1024
 )
 
 db = SQLAlchemy(myapp_obj)
