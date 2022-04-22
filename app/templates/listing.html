@@ -1,0 +1,14 @@
+<!doctype html>
+<h1>{{title}}</h1>
+<body>
+    <div class="row">
+        {% if filename %}
+        <div class="column">
+            <img src="{{ url_for('display_image', filename=filename) }}">
+        </div>
+        {% endif %}
+        <div class="column">
+            <p>{{description}}</p>
+        </div>
+    </div>
+</body>

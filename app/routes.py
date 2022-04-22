@@ -8,104 +8,131 @@ import os
 from werkzeug.utils import secure_filename
 
 
-@myapp_obj.route('/login', methods=['GET','POST'])
+@myapp_obj.route("/login", methods=["GET", "POST"])
 def login():
-	form = LoginForm()
-	if form.validate_on_submit():
-		username = form.username.data
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
 
-		user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username).first()
 
-		if user:
-			if user.check_password(form.password.data):
-				flash("Successful login!")
-				login_user(user)
-				return redirect('/')
-			else:
-				flash("Failed login")
-		else:
-			flash("Failed login")
+        if user:
+            if user.check_password(form.password.data):
+                flash("Successful login!")
+                login_user(user)
+                return redirect("/")
+            else:
+                flash("Failed login")
+        else:
+            flash("Failed login")
 
-	return render_template('login.html', title="Login", form=form)
+    return render_template("login.html", title="Login", form=form)
 
-@myapp_obj.route('/register', methods=['GET','POST'])
+
+@myapp_obj.route("/register", methods=["GET", "POST"])
 def register():
-	form = SignUpForm()
-	if form.validate_on_submit():
-		username = form.username.data
+    form = SignUpForm()
+    if form.validate_on_submit():
+        username = form.username.data
 
-		user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username).first()
 
-		if not user:
-			u = User(username=username)
-			u.set_password(form.password.data)
-			db.session.add(u)
-			db.session.commit()
-			return redirect('/login')
-		else:
-			flash("User already exists")
+        if not user:
+            u = User(username=username)
+            u.set_password(form.password.data)
+            db.session.add(u)
+            db.session.commit()
+            return redirect("/login")
+        else:
+            flash("User already exists")
 
-	return render_template('login.html', title='Register', form=form)
+    return render_template("login.html", title="Register", form=form)
 
-@myapp_obj.route('/logout')
+
+@myapp_obj.route("/logout")
 @login_required
 def logout():
-	logout_user()
-	return redirect('/login')
+    logout_user()
+    return redirect("/login")
 
-@myapp_obj.route('/')
+
+@myapp_obj.route("/")
 @login_required
 def home():
-	return 'home'
+    return "home"
 
-#Displaying images on a page seems to involve setting a landing page which has an embedded GET request for the appropriate imag
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+# Displaying images on a page seems to involve setting a landing page which has an embedded GET request for the appropriate imag
+
+ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif"])
+
 
 def allowed_file(filename):
-	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-	
-@myapp_obj.route('/newlisting', methods=['GET','POST'])
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@myapp_obj.route("/newlisting", methods=["GET", "POST"])
 @login_required
 def upload_form():
-	form = ListingForm()
+    form = ListingForm()
 
-	if form.validate_on_submit():
-		if not form.image.data:
-			flash('Please select an image')
-			return redirect(request.url)
-		
-		file = form.image.data
-		if file.filename == '':
-			flash('Please select an image')
-			return redirect(request.url)
-		
-		if file and allowed_file(file.filename):
-			filename = secure_filename(file.filename)
-			
-			if not os.path.exists(myapp_obj.config['UPLOAD_FOLDER']):
-				os.makedirs(myapp_obj.config['UPLOAD_FOLDER'])
-			
-			file.save(os.path.join(myapp_obj.config['UPLOAD_FOLDER'], filename))
-			
-			l = Listing(title=form.title.data, description=form.description.data, image=filename,seller=current_user)
-			db.session.add(l)
-			db.session.commit()
-			
-			listing = Listing.query.filter_by(image=filename)[0]
-			print(listing)
+    if form.validate_on_submit():
+        if not form.image.data:
+            flash("Please select an image")
+            return redirect(request.url)
 
-			return render_template('upload.html', title='New Listing', form=form, filename=listing.image)
-		else:
-			flash('Allowed image types are png, jpg, jpeg, and gif')
-			return redirect(request.url)
-	return render_template('upload.html', title='New Listing', form=form)
+        file = form.image.data
+        if file.filename == "":
+            flash("Please select an image")
+            return redirect(request.url)
 
-@myapp_obj.route('/display/<filename>')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+
+            if not os.path.exists(myapp_obj.config["UPLOAD_FOLDER"]):
+                os.makedirs(myapp_obj.config["UPLOAD_FOLDER"])
+
+            file.save(os.path.join(myapp_obj.config["UPLOAD_FOLDER"], filename))
+
+            l = Listing(
+                title=form.title.data,
+                description=form.description.data,
+                image=filename,
+                seller=current_user,
+            )
+            db.session.add(l)
+            db.session.commit()
+
+            listing = Listing.query.filter_by(image=filename)[0]
+            print(listing)
+
+            return render_template(
+                "upload.html", title="New Listing", form=form, filename=listing.image
+            )
+        else:
+            flash("Allowed image types are png, jpg, jpeg, and gif")
+            return redirect(request.url)
+    return render_template("upload.html", title="New Listing", form=form)
+
+
+@myapp_obj.route("/display/<filename>")
 @login_required
 def display_image(filename):
-	return redirect(url_for('static', filename='images/' + filename), code=301)
+    return redirect(url_for("static", filename="images/" + filename), code=301)
 
+
+@myapp_obj.route("/listing/<listing_id>")
+def display_listing(listing_id):
+    listing = Listing.query.filter_by(id=listing_id)[0]
+
+    if listing:
+        return render_template(
+            "listing.html",
+            title=listing.title,
+            description=listing.description,
+            filename=listing.image,
+        )
+    return redirect("/home")
 
 
 """@myapp_obj.route('/', methods=['POST'])
