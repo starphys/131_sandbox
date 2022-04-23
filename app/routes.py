@@ -133,27 +133,3 @@ def display_listing(listing_id):
             filename=listing.image,
         )
     return redirect("/home")
-
-
-"""@myapp_obj.route('/', methods=['POST'])
-def upload_image():
-	if 'file' not in request.files:
-		flash('No file part')
-		return redirect(request.url)
-	
-	file = request.files['file']
-	if file.filename == '':
-		flash('No image selected for uploading')
-		return redirect(request.url)
-	
-	if file and allowed_file(file.filename):
-		filename = secure_filename(file.filename)
-		
-		if not os.path.exists(myapp_obj.config['UPLOAD_FOLDER']):
-			os.makedirs(myapp_obj.config['UPLOAD_FOLDER'])
-		
-		file.save(os.path.join(myapp_obj.config['UPLOAD_FOLDER'], filename))
-		return render_template('upload.html', filename=filename)
-	else:
-		flash('Allowed image types are -> png, jpg, jpeg, gif')
-		return redirect(request.url)"""
