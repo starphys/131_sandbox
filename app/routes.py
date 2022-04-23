@@ -8,6 +8,13 @@ import os
 from werkzeug.utils import secure_filename
 
 
+ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif"])
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @myapp_obj.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -62,15 +69,6 @@ def home():
     return "home"
 
 
-# Displaying images on a page seems to involve setting a landing page which has an embedded GET request for the appropriate imag
-
-ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif"])
-
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 @myapp_obj.route("/newlisting", methods=["GET", "POST"])
 @login_required
 def upload_form():
@@ -98,6 +96,9 @@ def upload_form():
                 title=form.title.data,
                 description=form.description.data,
                 image=filename,
+                biddable=form.biddable.data,
+                buyable=form.buyable.data,
+                price=form.price.data,
                 seller=current_user,
             )
             db.session.add(l)
@@ -107,12 +108,15 @@ def upload_form():
             print(listing)
 
             return render_template(
-                "upload.html", title="New Listing", form=form, filename=listing.image
+                "newlisting.html",
+                title="New Listing",
+                form=form,
+                filename=listing.image,
             )
         else:
             flash("Allowed image types are png, jpg, jpeg, and gif")
             return redirect(request.url)
-    return render_template("upload.html", title="New Listing", form=form)
+    return render_template("newlisting.html", title="New Listing", form=form)
 
 
 @myapp_obj.route("/display/<filename>")
@@ -123,13 +127,15 @@ def display_image(filename):
 
 @myapp_obj.route("/listing/<listing_id>")
 def display_listing(listing_id):
-    listing = Listing.query.filter_by(id=listing_id)[0]
+    listing = Listing.query.filter_by(id=listing_id).first()
 
-    if listing:
+    if listing is not None:
         return render_template(
             "listing.html",
             title=listing.title,
             description=listing.description,
             filename=listing.image,
+            price="${:,.2f}".format(listing.price),
+            accepts_bids=listing.biddable,
         )
-    return redirect("/home")
+    return redirect("/")

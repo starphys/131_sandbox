@@ -11,7 +11,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True)
     password_hash = db.Column(db.String(128))
     listings = db.relationship("Listing", backref="seller", lazy="dynamic")
-    bids = db.relationship("Bid", backref="bids", lazy="dynamic")
+    bids = db.relationship("Bid", backref="bidder", lazy="dynamic")
 
     def __repr__(self):
         return f"<User = {self.username}, {self.email}>"
@@ -31,12 +31,9 @@ class Listing(db.Model):
     image = db.Column(db.String(256))
     biddable = db.Column(db.Boolean, default=False)
     buyable = db.Column(db.Boolean, default=False)
-    price = db.Column(
-        db.Integer
-    )  # stored as an integer in cents to avoid floating point errors.
-
+    price = db.Column(db.Numeric)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    bids = db.relationship("Bid", backref="bids", lazy="dynamic")
+    bids = db.relationship("Bid", backref="listing", lazy="dynamic")
 
     def __repr__(self):
         image = True
@@ -48,9 +45,7 @@ class Listing(db.Model):
 class Bid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow())
-    value = db.Column(
-        db.Integer
-    )  # stored as an integer in cents to avoid floating point errors.
+    value = db.Column(db.Numeric)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     listing_id = db.Column(db.Integer, db.ForeignKey("listing.id"))
 
