@@ -30,6 +30,7 @@ class Listing(db.Model):
     description = db.Column(db.String(256))
     image = db.Column(db.String(256))
     biddable = db.Column(db.Boolean, default=False)
+    buyable = db.Column(db.Boolean, default=False)
     price = db.Column(
         db.Integer
     )  # stored as an integer in cents to avoid floating point errors.
