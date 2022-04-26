@@ -25,3 +25,8 @@ class ListingForm(FlaskForm):
     biddable = BooleanField("Accept Bids")
     buyable = BooleanField("Available for Instant Purchase")
     submit = SubmitField("Create Listing")
+
+
+class AuctionForm(FlaskForm):
+    price = DecimalField("Price", places=2, validators=[DataRequired()])
+    submit = SubmitField("Place Your Bid")

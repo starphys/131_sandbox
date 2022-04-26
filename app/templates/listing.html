@@ -13,8 +13,10 @@
         <div class="column">
             <p>{{price}}</p>
         </div>
-        <div class="column">
-            <p>{{accepts_bids}}</p>
-        </div>
+    {% if accepts_bids %}
+    <form action="" method="post" novalidate enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <p>{{form.price}} {{form.submit()}}</p>
+    {% endif %}
     </div>
 </body>

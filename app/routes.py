@@ -1,6 +1,6 @@
 from app import myapp_obj, db, basedir
-from app.forms import LoginForm, SignUpForm, ListingForm
-from app.models import Listing, User
+from app.forms import AuctionForm, LoginForm, SignUpForm, ListingForm
+from app.models import Bid, Listing, User
 from flask import redirect, render_template, flash, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -125,11 +125,25 @@ def display_image(filename):
     return redirect(url_for("static", filename="images/" + filename), code=301)
 
 
-@myapp_obj.route("/listing/<listing_id>")
+@myapp_obj.route("/listing/<listing_id>", methods=["GET", "POST"])
 def display_listing(listing_id):
     listing = Listing.query.filter_by(id=listing_id).first()
+    form = AuctionForm()
 
     if listing is not None:
+        """if listing.biddable:
+        current_bids = listing.bids
+        if current_bids is not None:
+            print(type(current_bids))
+            for bid in current_bids:
+                print(bid)"""
+
+        if form.validate_on_submit():
+
+            b = Bid(value=form.price.data, bidder=current_user, listing_id=listing_id)
+            print(b)
+            db.session.add(b)
+            db.session.commit()
         return render_template(
             "listing.html",
             title=listing.title,
@@ -137,5 +151,6 @@ def display_listing(listing_id):
             filename=listing.image,
             price="${:,.2f}".format(listing.price),
             accepts_bids=listing.biddable,
+            form=form,
         )
     return redirect("/")
