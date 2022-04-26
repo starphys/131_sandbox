@@ -14,9 +14,12 @@
             <p>{{price}}</p>
         </div>
     {% if accepts_bids %}
-    <form action="" method="post" novalidate enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <p>{{form.price}} {{form.submit()}}</p>
+        {% if highest_bid %}
+            <p>Highest bid is: {{highest_bid}}</p>
+        {%endif%}
+        <form action="" method="post" novalidate enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <p>{{form.price}} {{form.submit()}}</p>
     {% endif %}
     </div>
 </body>

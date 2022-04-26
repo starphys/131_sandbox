@@ -131,19 +131,15 @@ def display_listing(listing_id):
     form = AuctionForm()
 
     if listing is not None:
-        """if listing.biddable:
-        current_bids = listing.bids
-        if current_bids is not None:
-            print(type(current_bids))
-            for bid in current_bids:
-                print(bid)"""
+        if listing.biddable:
+            highest_bid = listing.bids.order_by(Bid.value.desc()).first()
 
         if form.validate_on_submit():
-
             b = Bid(value=form.price.data, bidder=current_user, listing_id=listing_id)
-            print(b)
             db.session.add(b)
             db.session.commit()
+            highest_bid = listing.bids.order_by(Bid.value.desc()).first()
+
         return render_template(
             "listing.html",
             title=listing.title,
@@ -152,5 +148,6 @@ def display_listing(listing_id):
             price="${:,.2f}".format(listing.price),
             accepts_bids=listing.biddable,
             form=form,
+            highest_bid="${:,.2f}".format(highest_bid.value),
         )
     return redirect("/")
