@@ -1,5 +1,5 @@
 from app import myapp_obj, db, basedir
-from app.forms import AuctionForm, LoginForm, SignUpForm, ListingForm
+from app.forms import AuctionForm, CreditCardForm, LoginForm, SignUpForm, ListingForm
 from app.models import Bid, Listing, User
 from flask import redirect, render_template, flash, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
@@ -174,3 +174,12 @@ def display_listing(listing_id):
                 accepts_bids=listing.biddable,
             )
     return redirect("/")
+
+
+@myapp_obj.route("/checkout", methods=["GET", "POST"])
+def checkout():
+    form = CreditCardForm()
+    return render_template(
+        "checkout.html",
+        form=form,
+    )

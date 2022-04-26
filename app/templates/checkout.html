@@ -1,0 +1,20 @@
+<form action="" method="post" novalidate enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.number.label}}<br />
+      {{ form.number(size=16) }}
+    </p>
+    <p>
+      {{ form.name.label }}<br />
+      {{ form.name}}
+    </p>
+    <p>
+      {{ form.expire_date.label }}<br />
+      {{ form.expire_date}}
+    </p>
+    <p>
+      {{ form.cvv.label }}<br />
+      {{ form.cvv}}
+    </p>
+    <p>{{ form.submit() }}</p>
+  </form>

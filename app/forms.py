@@ -1,8 +1,16 @@
 from re import sub
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
-from wtforms.validators import DataRequired
+from wtforms import (
+    StringField,
+    PasswordField,
+    BooleanField,
+    SubmitField,
+    DecimalField,
+    IntegerField,
+    DateField,
+)
+from wtforms.validators import DataRequired, Length
 
 
 class LoginForm(FlaskForm):
@@ -30,3 +38,13 @@ class ListingForm(FlaskForm):
 class AuctionForm(FlaskForm):
     price = DecimalField("Price", places=2, validators=[DataRequired()])
     submit = SubmitField("Place Your Bid")
+
+
+class CreditCardForm(FlaskForm):
+    number = IntegerField(
+        "Credit Card Number", validators=[DataRequired(), Length(min=16, max=16)]
+    )
+    name = StringField("Name on Card", validators=[DataRequired()])
+    expire_date = DateField("Expiration Date", validators=[DataRequired()])
+    cvv = IntegerField("CVV", validators=[DataRequired(), Length(min=3, max=3)])
+    submit = SubmitField("Confirm Purchase")
