@@ -1,0 +1,25 @@
+<!doctype html>
+<h1>{{title}}</h1>
+<body>
+    <div class="row">
+        {% if filename %}
+        <div class="column">
+            <img src="{{ url_for('display_image', filename=filename) }}">
+        </div>
+        {% endif %}
+        <div class="column">
+            <p>{{description}}</p>
+        </div>
+        <div class="column">
+            <p>{{price}}</p>
+        </div>
+    {% if accepts_bids %}
+        {% if highest_bid %}
+            <p>Highest bid is: {{highest_bid}}</p>
+        {%endif%}
+        <form action="" method="post" novalidate enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <p>{{form.price}} {{form.submit()}}</p>
+    {% endif %}
+    </div>
+</body>

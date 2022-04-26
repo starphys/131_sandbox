@@ -12,6 +12,10 @@
 </p>
 
 <h1>{{title}}</h1>
+{% for field, errors in form.errors.items() %}
+  {{ ', '.join(errors) }}
+{% endfor %}
+
 <form action="" method="post" novalidate enctype="multipart/form-data">
   {{ form.hidden_tag() }}
   <p>
@@ -21,6 +25,18 @@
   <p>
     {{ form.description.label }}<br />
     {{ form.description(size=256) }}
+  </p>
+  <p>
+    {{ form.buyable.label }}<br />
+    {{ form.buyable}}
+  </p>
+  <p>
+    {{ form.price.label }}<br />
+    {{ form.price}}
+  </p>
+  <p>
+    {{ form.biddable.label }}<br />
+    {{ form.biddable}}
   </p>
   <p>
     {{ form.image.label }}<br />
