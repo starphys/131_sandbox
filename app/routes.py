@@ -138,7 +138,7 @@ def display_listing(listing_id):
     listing = Listing.query.filter_by(id=listing_id).first()
 
     if listing is not None:
-        if listing.biddable:
+        if listing.biddable and datetime.utcnow() < listing.auction_end_time:
             form = AuctionForm()
             highest_bid = listing.bids.order_by(Bid.value.desc()).first()
 
