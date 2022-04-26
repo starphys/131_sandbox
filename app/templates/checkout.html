@@ -1,0 +1,38 @@
+<!doctype html>
+<p>
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+		<ul>
+		{% for message in messages %}
+		  <li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+	  {% endif %}
+	{% endwith %}
+</p>
+
+<h1>{{title}}</h1>
+{% for field, errors in form.errors.items() %}
+  {{ ', '.join(errors) }}
+{% endfor %}
+
+<form action="" method="post" novalidate enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.number.label}}<br />
+      {{ form.number(size=16) }}
+    </p>
+    <p>
+      {{ form.name.label }}<br />
+      {{ form.name}}
+    </p>
+    <p>
+      {{ form.expire_date.label }}<br />
+      {{ form.expire_date}}
+    </p>
+    <p>
+      {{ form.cvv.label }}<br />
+      {{ form.cvv}}
+    </p>
+    <p>{{ form.submit() }}</p>
+  </form>
