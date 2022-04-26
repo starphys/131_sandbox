@@ -76,6 +76,9 @@ def upload_form():
     form = ListingForm()
 
     if form.validate_on_submit():
+        if form.auction_end_time.data <= datetime.utcnow().date():
+            flash("Auction must end in the future.")
+            return redirect(request.url)
         if not form.image.data:
             flash("Please select an image")
             return redirect(request.url)
@@ -98,6 +101,7 @@ def upload_form():
                 description=form.description.data,
                 image=filename,
                 biddable=form.biddable.data,
+                auction_end_time=form.auction_end_time.data,
                 buyable=form.buyable.data,
                 price=form.price.data,
                 seller=current_user,
@@ -107,6 +111,9 @@ def upload_form():
 
             listing = Listing.query.filter_by(image=filename)[0]
             print(listing)
+            print(
+                f"Submitted: {form.auction_end_time.data}, current: {datetime.utcnow().date()}"
+            )
 
             return render_template(
                 "newlisting.html",

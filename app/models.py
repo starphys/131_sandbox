@@ -30,6 +30,7 @@ class Listing(db.Model):
     description = db.Column(db.String(256))
     image = db.Column(db.String(256))
     biddable = db.Column(db.Boolean, default=False)
+    auction_end_time = db.Column(db.DateTime)
     buyable = db.Column(db.Boolean, default=False)
     price = db.Column(db.Numeric)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))

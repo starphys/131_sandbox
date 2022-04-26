@@ -9,6 +9,7 @@ from wtforms import (
     DecimalField,
     IntegerField,
     DateField,
+    DateTimeLocalField,
 )
 from wtforms.validators import DataRequired, Length
 
@@ -31,6 +32,7 @@ class ListingForm(FlaskForm):
     image = FileField("Image", validators=[FileRequired()])
     price = DecimalField("Purchase Price", places=2)
     biddable = BooleanField("Accept Bids")
+    auction_end_time = DateField("Until")
     buyable = BooleanField("Available for Instant Purchase")
     submit = SubmitField("Create Listing")
 
