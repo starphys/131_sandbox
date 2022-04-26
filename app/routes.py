@@ -1,3 +1,4 @@
+from datetime import datetime
 from app import myapp_obj, db, basedir
 from app.forms import AuctionForm, CreditCardForm, LoginForm, SignUpForm, ListingForm
 from app.models import Bid, Listing, User
@@ -179,7 +180,20 @@ def display_listing(listing_id):
 @myapp_obj.route("/checkout", methods=["GET", "POST"])
 def checkout():
     form = CreditCardForm()
+
+    if form.validate_on_submit():
+        if form.expire_date.data <= datetime.utcnow().date():
+            flash("Card is expired, submit another card")
+        try:
+            cc_number = int(form.number.data)
+        except ValueError:
+            flash("Entered an invalid credit card number.")
+        try:
+            cvv = int(form.cvv.data)
+        except ValueError:
+            flash("Entered an invalid CVV number.")
     return render_template(
         "checkout.html",
+        title="Checkout",
         form=form,
     )

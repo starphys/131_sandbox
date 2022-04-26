@@ -41,10 +41,10 @@ class AuctionForm(FlaskForm):
 
 
 class CreditCardForm(FlaskForm):
-    number = IntegerField(
+    number = StringField(
         "Credit Card Number", validators=[DataRequired(), Length(min=16, max=16)]
     )
     name = StringField("Name on Card", validators=[DataRequired()])
     expire_date = DateField("Expiration Date", validators=[DataRequired()])
-    cvv = IntegerField("CVV", validators=[DataRequired(), Length(min=3, max=3)])
+    cvv = StringField("CVV", validators=[DataRequired(), Length(min=3, max=3)])
     submit = SubmitField("Confirm Purchase")
