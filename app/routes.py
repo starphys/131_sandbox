@@ -128,26 +128,49 @@ def display_image(filename):
 @myapp_obj.route("/listing/<listing_id>", methods=["GET", "POST"])
 def display_listing(listing_id):
     listing = Listing.query.filter_by(id=listing_id).first()
-    form = AuctionForm()
 
     if listing is not None:
         if listing.biddable:
+            form = AuctionForm()
             highest_bid = listing.bids.order_by(Bid.value.desc()).first()
 
-        if form.validate_on_submit():
-            b = Bid(value=form.price.data, bidder=current_user, listing_id=listing_id)
-            db.session.add(b)
-            db.session.commit()
-            highest_bid = listing.bids.order_by(Bid.value.desc()).first()
+            if highest_bid is None:
+                highest_bid = Bid(value=0.00)
 
-        return render_template(
-            "listing.html",
-            title=listing.title,
-            description=listing.description,
-            filename=listing.image,
-            price="${:,.2f}".format(listing.price),
-            accepts_bids=listing.biddable,
-            form=form,
-            highest_bid="${:,.2f}".format(highest_bid.value),
-        )
+            if form.validate_on_submit():
+                if form.price.data <= highest_bid.value:
+                    flash(
+                        "${:,.2f} is not larger than the highest bid.".format(
+                            form.price.data
+                        )
+                    )
+                else:
+                    b = Bid(
+                        value=form.price.data,
+                        bidder=current_user,
+                        listing_id=listing_id,
+                    )
+                    db.session.add(b)
+                    db.session.commit()
+                    highest_bid = listing.bids.order_by(Bid.value.desc()).first()
+
+            return render_template(
+                "listing.html",
+                title=listing.title,
+                description=listing.description,
+                filename=listing.image,
+                price="${:,.2f}".format(listing.price),
+                accepts_bids=listing.biddable,
+                form=form,
+                highest_bid="${:,.2f}".format(highest_bid.value),
+            )
+        else:
+            return render_template(
+                "listing.html",
+                title=listing.title,
+                description=listing.description,
+                filename=listing.image,
+                price="${:,.2f}".format(listing.price),
+                accepts_bids=listing.biddable,
+            )
     return redirect("/")
